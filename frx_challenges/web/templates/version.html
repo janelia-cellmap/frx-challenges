@@ -29,7 +29,7 @@
         </div>
         <div class="row py-4">
             <h4>Result</h4>
-            {% if is_collaborator %}
+            {% if is_collaborator and evaluation.status == 'EVALUATED' %}
                 <a href="{% url 'download-results' version.id %}">Download results</a>
             {% endif %}
             {% if evaluation.status == 'EVALUATED' %}
