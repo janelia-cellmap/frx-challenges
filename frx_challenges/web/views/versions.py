@@ -55,7 +55,7 @@ def upload(request: HttpRequest, id: int) -> HttpResponse:
 @login_required
 def download_results(request: HttpRequest, id: int) -> HttpResponse:
     version = Version.objects.get(id=id)
-    is_collaborator = _validate_collaborator(request, version.submission.id)
+    is_collaborator = _validate_collaborator(request, id)
     if not is_collaborator:
         raise Http404(
             "Full results files are only available to submission collaborators."
