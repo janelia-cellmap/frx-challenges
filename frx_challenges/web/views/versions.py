@@ -77,7 +77,7 @@ def download_results(request: HttpRequest, id: int) -> HttpResponse:
 def view(request: HttpRequest, id: int) -> HttpResponse:
     version = Version.objects.get(id=id)
     evaluation = version.latest_evaluation
-    is_collaborator = _validate_collaborator(request, version.submission.id)
+    is_collaborator = _validate_collaborator(request, id)
 
     results_display = []
     if evaluation.result:
