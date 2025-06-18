@@ -30,7 +30,7 @@
         <div class="row py-4">
             <h4>Result</h4>
             {% if is_collaborator %}
-                (<a href="{% url 'download-results' version.id %}">download results</a>)
+                <a href="{% url 'download-results' version.id %}">Download results</a>
             {% endif %}
             {% if evaluation.status == 'EVALUATED' %}
                 {% for result_item in results_display %}
