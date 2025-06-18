@@ -150,7 +150,7 @@ class Evaluation(models.Model):
         Return the percentage of completion of this evaluation
         """
         if self.status == Evaluation.Status.EVALUATED:
-            return "100%"
+            return "Completed"
         elif self.status == Evaluation.Status.EVALUATING:
             if self.result:
                 percent_complete = self.result.get(
