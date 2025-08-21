@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "frx-challenges.fullname" . }}-django-yamlconf
-data:
-  frx_challenges.yaml: |
-    {{ mustToJson .Values.yamlSettings.overrides }}
