@@ -1,7 +1,7 @@
 aiodocker
 aiohttp >= 3.10.5
 crispy-bootstrap5
-django
+django >= 5.0, < 6.0
 django-allauth[socialaccount]
 django-crispy-forms
 django-jsonform
