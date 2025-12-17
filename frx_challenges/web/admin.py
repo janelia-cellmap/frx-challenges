@@ -15,6 +15,11 @@ class ContentFileAdmin(VersionAdmin):
     prepopulated_fields = {"slug": ("title",)}
 
 
-admin.site.register([Version, Evaluation, Submission, Collaborator])
+@admin.register(Evaluation)
+class EvaluationAdmin(VersionAdmin):
+    list_display = ("id", "status", "created_at", "last_updated")
+
+
+admin.site.register([Version, Submission, Collaborator])
 
 admin.site.login = secure_admin_login(admin.site.login)
