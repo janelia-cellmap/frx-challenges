@@ -55,6 +55,7 @@ yamlSettings:
     SUBMISSIONS_RESULTS_DIR: /opt/state/submission-results/
 
 adminUsers: []
+databaseReaders: []
 
 nginx:
   image:
