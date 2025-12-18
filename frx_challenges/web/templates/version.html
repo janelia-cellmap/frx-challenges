@@ -42,8 +42,8 @@
             {% elif evaluation.status == 'FAILED' %}
                 <div class="text-center">
                     <p class="text-danger">Evaluation failed</p>
-                    {% if evaluation.evaluator_logs %}
-                        <pre class="text-start bg-light p-3 border rounded">{{ evaluation.evaluator_logs|linebreaksbr|slice:"-500:" }}</pre>
+                    {% if evaluation.last_log_line %}
+                        <p class="text-start bg-light p-3 border rounded font-monospace">{{ evaluation.last_log_line }}</p>
                     {% endif %}
                     <p class="text-muted mt-3">
                         If you are unable to resolve this error, please contact our support team at
