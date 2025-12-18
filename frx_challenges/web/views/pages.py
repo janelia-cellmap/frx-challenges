@@ -27,7 +27,7 @@ def view(request: HttpRequest, slug: str) -> HttpResponse:
     try:
         page = Page.objects.get(slug=slug)
     except Page.DoesNotExist:
-        return Http404()
+        raise Http404()
 
     return render_page(request, page)
 
@@ -36,7 +36,7 @@ def home(request: HttpRequest) -> HttpResponse:
     try:
         page = Page.objects.get(is_home=True)
     except Page.DoesNotExist:
-        return Http404()
+        raise Http404()
 
     return render_page(request, page)
 
@@ -48,5 +48,5 @@ def content_file(request: HttpRequest, slug: str) -> HttpResponse:
     try:
         cf = ContentFile.objects.get(slug=slug)
     except Page.DoesNotExist:
-        return Http404()
+        raise Http404()
     return redirect(cf.file.url)

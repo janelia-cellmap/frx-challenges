@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      # Mount the entire project for live code reloading
+      - ./frx_challenges:/opt/frx-challenges/frx_challenges
+      # Mount podman socket for evaluation harness
+      - /run/podman/podman.sock:/var/run/docker.sock:rw
+      # Persist database
+      - ./data/db:/opt/frx-challenges/frx_challenges/db
+      # Persist uploads and outputs
+      - ./data/uploads:/opt/frx-challenges/frx_challenges/uploads
+      - ./data/outputs:/opt/frx-challenges/frx_challenges/outputs
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DJANGO_SETTINGS_MODULE=frx_challenges.settings
+      # Podman socket path
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    working_dir: /opt/frx-challenges/frx_challenges
+    stdin_open: true
+    tty: true
+    # Allow container to spawn other containers via podman socket
+    privileged: true

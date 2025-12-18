@@ -40,6 +40,25 @@ architecture-beta
 
 _Figure A: CellMap Challenge architecture diagram._
 
+## Local Development
+
+For detailed instructions on setting up a local development environment using podman-compose, see [DEVELOPMENT.md](DEVELOPMENT.md).
+
+Quick start:
+
+```bash
+# Run the setup script (creates directories, copies .env, checks prerequisites)
+./setup-dev.sh
+
+# Build and start the development environment
+podman-compose up --build
+
+# In another terminal, run migrations
+podman-compose exec web python manage.py migrate
+
+# Access the application at http://localhost:8000
+```
+
 ## Workflow
 
 ### Image building and helm charts

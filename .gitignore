@@ -167,3 +167,15 @@ _build
 # VS Code
 .DS_Store
 .vscode/
+
+# Local development data (podman-compose volumes)
+/data/
+
+# Local development config (matches django-yamlconf convention)
+frx_challenges/frx_challenges.yaml
+
+# Django runtime data directories
+frx_challenges/db/
+frx_challenges/media/
+frx_challenges/outputs/
+frx_challenges/uploads/

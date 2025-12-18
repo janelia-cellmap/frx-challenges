@@ -201,6 +201,12 @@ LOGIN_URL = "/accounts/github/login/"
 # FIXME: Understand the security implications?
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
+# Development: Allow Django built-in authentication when DEBUG is True
+if DEBUG:
+    SOCIALACCOUNT_ONLY = False
+    LOGIN_URL = "/accounts/login/"
+    SOCIALACCOUNT_LOGIN_ON_GET = False
+
 # Challenge state can have the following values:
 # - NOT_STARTED: The challenge has not started yet
 # - RUNNING: The challenge is currently running
