@@ -162,6 +162,16 @@ class Evaluation(models.Model):
         else:
             return "0%"
 
+    @property
+    def last_log_line(self) -> str:
+        """
+        Return the last line of the evaluator logs
+        """
+        if not self.evaluator_logs:
+            return ""
+        lines = self.evaluator_logs.strip().splitlines()
+        return lines[-1] if lines else ""
+
     def __str__(self):
         return f"({self.status}) {self.result} {self.version.data_uri}"
 

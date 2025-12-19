@@ -39,6 +39,18 @@
                         <p>{{ result_item.value }}</p>
                     </div>
                 {% endfor %}
+            {% elif evaluation.status == 'FAILED' %}
+                <div class="text-center">
+                    <p class="text-danger">Evaluation failed</p>
+                    {% if evaluation.last_log_line %}
+                        <p class="text-start bg-light p-3 border rounded font-monospace">{{ evaluation.last_log_line }}</p>
+                    {% endif %}
+                    <p class="text-muted mt-3">
+                        If you are unable to resolve this error, please contact our support team at
+                        <a href="mailto:cellmapchallenge@janelia.hhmi.org">cellmapchallenge@janelia.hhmi.org</a>
+                        for assistance.
+                    </p>
+                </div>
             {% else %}
                 <div class="text-center">Evaluation results will be displayed here once completed</div>
             {% endif %}

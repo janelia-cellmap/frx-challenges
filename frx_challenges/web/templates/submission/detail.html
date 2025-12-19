@@ -76,7 +76,9 @@
                                         <a href={% url 'versions-view' v.id %}>{{ v.filename }}</a>
                                     </td>
                                     <td>{{ v.created_at|date:"c" }}</td>
-                                    <td>{{ v.latest_evaluation.status }}</td>
+                                    <td>
+                                        <a href={% url 'versions-view' v.id %}>{{ v.latest_evaluation.status }}</a>
+                                    </td>
                                     {% for r in v.latest_evaluation.ordered_results %}
                                         <td scope="col">
                                             {% if r %}{{ r }}{% endif %}
