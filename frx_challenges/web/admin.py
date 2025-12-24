@@ -19,11 +19,11 @@ class ContentFileAdmin(VersionAdmin):
 
 @admin.register(Evaluation)
 class EvaluationAdmin(VersionAdmin):
-    list_display = ("id", "status", "version_link", "submission_name", "created_at", "last_updated")
+    list_display = ("id", "status", "version_link", "submission_name", "version__user__username", "created_at", "last_updated")
 
     def version_link(self, obj):
         url = reverse("admin:web_version_change", args=[obj.version.id])
-        return format_html('<a href="{}">Version {} ({})</a>', url, obj.version.id, obj.version.filename)
+        return format_html('<a href="{}">Version {} </a>', url, obj.version.id)
 
     def submission_name(self, obj):
         return obj.version.submission.name

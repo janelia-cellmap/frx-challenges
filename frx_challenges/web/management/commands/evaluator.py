@@ -2,6 +2,7 @@ import asyncio
 import collections.abc
 import json
 import logging
+import math
 import os
 import tempfile
 from typing import Optional
@@ -17,6 +18,24 @@ from web.utils import recursive_update
 from ...models import Evaluation
 
 logger = logging.getLogger()
+
+
+def sanitize_json(data):
+    """
+    Recursively sanitize JSON data by replacing NaN, Infinity, and -Infinity
+    with None, as these values are not valid in the JSON specification.
+    """
+    if isinstance(data, dict):
+        return {key: sanitize_json(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [sanitize_json(item) for item in data]
+    elif isinstance(data, float):
+        if math.isnan(data) or math.isinf(data):
+            logger.warning(f"Replacing invalid JSON value {data} with None")
+            return None
+        return data
+    else:
+        return data
 
 
 class DockerEvaluator:
@@ -163,6 +182,7 @@ class DockerEvaluator:
         try:
             with fsspec.open(state["results_uri"]) as f:
                 result = json.load(f)
+            result = sanitize_json(result)
             return result
         except FileNotFoundError:
             if container["State"]["Status"] != "exited":
@@ -203,11 +223,23 @@ class Command(BaseCommand):
             else:
                 evaluation.status = Evaluation.Status.EVALUATED
                 evaluation.result = result
-            await evaluation.asave()
+            try:
+                await evaluation.asave()
+            except Exception as e:
+                logger.error(
+                    f"Failed to save evaluation {evaluation.id}: {e}. Result type: {type(result)}, Result: {result}"
+                )
+                raise
         else:
             if result is not None:
                 evaluation.result = result
-                await evaluation.asave()
+                try:
+                    await evaluation.asave()
+                except Exception as e:
+                    logger.error(
+                        f"Failed to save evaluation {evaluation.id}: {e}. Result type: {type(result)}, Result: {result}"
+                    )
+                    raise
             logger.info(f"{evaluation} is still running")
 
     async def ahandle(self):
