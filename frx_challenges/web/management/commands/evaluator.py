@@ -184,6 +184,11 @@ class DockerEvaluator:
                 result = json.load(f)
             result = sanitize_json(result)
             return result
+        except json.JSONDecodeError as e:
+            logger.error(
+                f"Invalid JSON in results file {state['results_uri']}: {e}"
+            )
+            return None
         except FileNotFoundError:
             if container["State"]["Status"] != "exited":
                 logger.warning(
