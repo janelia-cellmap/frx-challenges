@@ -54,10 +54,11 @@ class DockerEvaluator:
                 raise
         if not image_info:
             logger.info(f"Starting to pull Docker image: {self.image}")
-            async for line in self.docker.images.pull(
+            await self.docker.images.pull(
                 self.image, auth=settings.EVALUATOR_DOCKER_AUTH
-            ):
-                logger.debug(f"Pull progress: {line}")
+            )
+            # Verify the image was actually pulled and is available
+            image_info = await self.docker.images.get(self.image)
             logger.info(f"Successfully pulled Docker image: {self.image}")
         else:
             logger.info(f"Not pulling {self.image}, it already exists")
