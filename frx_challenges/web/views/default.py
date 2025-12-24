@@ -46,10 +46,15 @@ def leaderboard(request: HttpRequest) -> HttpResponse:
         bv: Version = r["best_version"]
         sort_key = []
         for dc in sorted_display_config:
+            value = bv.latest_evaluation.result[dc["result_key"]]
+            # Handle None values by using infinity (sorts to end)
+            if value is None:
+                value = float('inf')
+
             if dc["ordering"] == "ascending":
-                sort_key.append(-bv.latest_evaluation.result[dc["result_key"]])
+                sort_key.append(-value)
             elif dc["ordering"] == "descending":
-                sort_key.append(bv.latest_evaluation.result[dc["result_key"]])
+                sort_key.append(value)
             else:
                 raise ValueError(
                     f"Invalid ordering {dc['ordering']} found for result_key {dc['result_key']}"

@@ -45,7 +45,7 @@
                                     {% for m in result.metadata %}<td>{{ m }}</td>{% endfor %}
                                     {% for r in result.best_version.latest_evaluation.ordered_results %}
                                         <td scope="col">
-                                            {% if r %}{{ r }}{% endif %}
+                                            {% if r is not None %}{{ r }}{% endif %}
                                         </td>
                                     {% endfor %}
                                 </tr>

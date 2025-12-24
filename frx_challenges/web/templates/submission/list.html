@@ -50,7 +50,7 @@
                                 {% if sub.best_version.latest_evaluation.ordered_results %}
                                     {% for r in sub.best_version.latest_evaluation.ordered_results %}
                                         <td scope="col">
-                                            {% if r %}{{ r }}{% endif %}
+                                            {% if r is not None %}{{ r }}{% endif %}
                                         </td>
                                     {% endfor %}
                                 {% else %}

@@ -81,7 +81,7 @@
                                     </td>
                                     {% for r in v.latest_evaluation.ordered_results %}
                                         <td scope="col">
-                                            {% if r %}{{ r }}{% endif %}
+                                            {% if r is not None %}{{ r }}{% endif %}
                                         </td>
                                     {% endfor %}
                                 </tr>
