@@ -173,7 +173,7 @@ class Evaluation(models.Model):
         return lines[-1] if lines else ""
 
     def __str__(self):
-        return f"({self.status}) {self.result} {self.version.data_uri}"
+        return f"{self.id}: ({self.status}) {self.version.data_uri}"
 
 
 class Collaborator(models.Model):
