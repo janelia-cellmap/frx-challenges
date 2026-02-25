@@ -23,6 +23,7 @@ services:
       - DJANGO_SETTINGS_MODULE=frx_challenges.settings
       # Podman socket path
       - DOCKER_HOST=unix:///var/run/docker.sock
+      - EVALUATOR_DOCKER_IMAGE=${EVALUATOR_DOCKER_IMAGE}
     working_dir: /opt/frx-challenges/frx_challenges
     stdin_open: true
     tty: true

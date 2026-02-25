@@ -54,12 +54,27 @@ class DockerEvaluator:
                 raise
         if not image_info:
             logger.info(f"Starting to pull Docker image: {self.image}")
-            await self.docker.images.pull(
-                self.image, auth=settings.EVALUATOR_DOCKER_AUTH
-            )
+            try:
+                await self.docker.images.pull(
+                    self.image, auth=settings.EVALUATOR_DOCKER_AUTH
+                )
+                logger.info(f"Pull command completed for: {self.image}")
+            except Exception as e:
+                logger.error(f"Failed to pull Docker image {self.image}: {e}")
+                raise
+
             # Verify the image was actually pulled and is available
-            image_info = await self.docker.images.get(self.image)
-            logger.info(f"Successfully pulled Docker image: {self.image}")
+            try:
+                image_info = await self.docker.images.get(self.image)
+                logger.info(f"Successfully pulled and verified Docker image: {self.image}")
+            except aiodocker.DockerError as e:
+                if e.status == 404:
+                    logger.error(
+                        f"Image {self.image} not found after pull. "
+                        f"This may indicate insufficient disk space, network issues, "
+                        f"or authentication problems."
+                    )
+                raise
         else:
             logger.info(f"Not pulling {self.image}, it already exists")
 

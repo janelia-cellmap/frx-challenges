@@ -223,7 +223,9 @@ SUBMISSIONS_UPLOADS_DIR = out_dir
 output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "outputs/"))
 SUBMISSIONS_RESULTS_DIR = output_dir
 
-EVALUATOR_DOCKER_IMAGE = "quay.io/yuvipanda/evaluator-harness:latest"
+EVALUATOR_DOCKER_IMAGE = os.getenv(
+    "EVALUATOR_DOCKER_IMAGE", "quay.io/yuvipanda/evaluator-harness:latest"
+)
 # `{submission_path}` and `{result_path}` are substituted
 EVALUATOR_DOCKER_CMD = ["{submission_path}", "{result_path}"]
 
