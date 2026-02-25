@@ -65,7 +65,7 @@ podman-compose exec web python manage.py migrate
 
 Pushing changes to this repository will trigger the following
 
-- an image build that is pushed to [quay.io](https://quay.io/repository/2i2c/janelia-frx-challenges?tab=tags)
+- an image build that is pushed to [ghcr.io](https://ghcr.io/janelia-cellmap/frx-challenges)
 - a helm chart release that is published at [janelia-cellmap.github.io/frx-challenges/](https://janelia-cellmap.github.io/frx-challenges/).
 
 ### Updating the staging website
@@ -81,7 +81,7 @@ Then, open a pull request against the [2i2c-org/frx-challenges-deploy](https://g
 ```yaml
 frx-challenges:
   image:
-    repository: quay.io/2i2c/janelia-frx-challenges
+    repository: ghcr.io/janelia-cellmap/frx-challenges
     tag: 0.0.1-0.dev.git.<update-image-tag>
 ```
 
