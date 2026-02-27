@@ -3,6 +3,15 @@ entries:
   frx-challenges:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2026-02-27T18:18:07.273698823Z"
+    description: A Helm chart for Kubernetes
+    digest: 62051a91013f3222c47e2c00cf28df7756b1734fa10eb310e001b41fba04381b
+    name: frx-challenges
+    urls:
+    - https://janelia-cellmap.github.io/frx-challenges/frx-challenges-0.0.1-0.dev.git.590.hbc73b4d.tgz
+    version: 0.0.1-0.dev.git.590.hbc73b4d
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2026-02-25T19:04:24.83077761Z"
     description: A Helm chart for Kubernetes
     digest: 26de8c154b9e225cd16872fae3f0e9d5090837338b8d6dc07367a98db1549f97
@@ -163,4 +172,4 @@ entries:
     urls:
     - https://janelia.github.io/frx-challenges-helm-chart/frx-challenges-0.0.1-0.dev.git.535.h23ffa18.tgz
     version: 0.0.1-0.dev.git.535.h23ffa18
-generated: "2026-02-25T19:04:24.830207807Z"
+generated: "2026-02-27T18:18:07.273166568Z"
