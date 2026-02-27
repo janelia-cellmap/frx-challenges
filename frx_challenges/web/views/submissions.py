@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -19,7 +19,23 @@ def create(request: HttpRequest) -> HttpResponse:
     )
 
     if request.method == "POST":
-        return HttpResponseForbidden("Access denied: Submission creation is disabled.")
+        form = SubmissionForm(request.POST)
+        if form.is_valid():
+            submission = Submission()
+            submission.user = request.user
+            submission.name = form.cleaned_data["name"]
+            submission.description = form.cleaned_data["description"]
+            submission.metadata = form.cleaned_data["metadata"]
+            submission.toc_accepted = form.cleaned_data["toc_accepted"]
+            submission.save()
+            collaborator = Collaborator()
+            collaborator.submission_id = submission.id
+            collaborator.user_id = request.user.id
+            collaborator.is_owner = True
+            collaborator.save()
+            return HttpResponseRedirect(
+                reverse("submissions-detail", args=[submission.id])
+            )
     else:
         form = SubmissionForm()
 
@@ -108,7 +124,17 @@ def edit(request: HttpRequest, id: int) -> HttpResponse:
         raise Http404("You are not the owner of this submission.")
 
     if request.method == "POST":
-        return HttpResponseForbidden("Access denied: Submission editing is disabled.")
+        form = SubmissionForm(request.POST, instance=submission)
+        if form.is_valid():
+            submission.user = request.user
+            submission.name = form.cleaned_data["name"]
+            submission.description = form.cleaned_data["description"]
+            submission.metadata = form.cleaned_data["metadata"]
+            submission.toc_accepted = form.cleaned_data["toc_accepted"]
+            submission.save()
+            return HttpResponseRedirect(
+                reverse("submissions-detail", args=[submission.id])
+            )
     else:
         form = SubmissionForm(instance=submission)
 

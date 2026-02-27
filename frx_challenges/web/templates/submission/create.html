@@ -14,28 +14,4 @@
             <div class="col py-2">{% crispy form %}</div>
         </div>
     </div>
-    <style>
-        button[type="submit"][disabled], input[type="submit"][disabled] {
-            background-color: #6c757d !important;
-            border-color: #6c757d !important;
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    return false;
-                });
-
-                const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
-                submitButtons.forEach(function(button) {
-                    button.disabled = true;
-                });
-            }
-        });
-    </script>
 {% endblock body %}
