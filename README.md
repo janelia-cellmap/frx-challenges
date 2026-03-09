@@ -14,7 +14,7 @@ The CellMap Challenge website is based on the general open-source framework prov
 
 The Janelia team maintains the [janelia-cellmap/cellmap-segmentation-challenge](https://github.com/janelia-cellmap/cellmap-segmentation-challenge) GitHub repository, which defines the evaluation mechanism for scoring challenge submissions (see Figure A2).
 
-Website customizations and evaluator settings are configured and applied downstream during deployment, which is version-controlled and managed with Continuous Integration/Continuous Deployment (CI/CD) best practices at the [2i2c-org/frx-challenges-deploy](https://github.com/2i2c-org/frx-challenges-deploy) GitHub repository (see Figure A3).
+Website customizations and evaluator settings are configured and applied downstream during deployment, which is version-controlled and managed with Continuous Integration/Continuous Deployment (CI/CD) best practices at the [JaneliaSciComp/frx-challenges-deploy](https://github.com/JaneliaSciComp/frx-challenges-deploy) GitHub repository (see Figure A3).
 
 The website deployment is released to a production environment (see Figure A5) hosted on Google Cloud Platform (GCP) that 2i2c operates and maintains. There is also a staging environment for testing any changes or updates before rolling out to production (see Figure A4).
 
@@ -76,7 +76,7 @@ To stage website changes from a helm chart release to the staging environment, m
 0.0.1-0.dev.git.537.h8898fa7
 ```
 
-Then, open a pull request against the [2i2c-org/frx-challenges-deploy](https://github.com/2i2c-org/frx-challenges-deploy) repository and update the `app/staging/staging.values.yaml` file, update the `image.tag` field to the latest helm chart version:
+Then, open a pull request against the [JaneliaSciComp/frx-challenges-deploy](https://github.com/JaneliaSciComp/frx-challenges-deploy) repository and update the `app/staging/staging.values.yaml` file, update the `image.tag` field to the latest helm chart version:
 
 ```yaml
 frx-challenges:
