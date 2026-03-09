@@ -6,7 +6,7 @@ from ..models import Submission, Version
 
 
 def leaderboard(request: HttpRequest) -> HttpResponse:
-    if settings.CHALLENGE_STATE != "RUNNING":
+    if settings.CHALLENGE_STATE not in ("RUNNING", "PAUSED"):
         return HttpResponse(
             "Challenge hasn't started, so leaderboard is not available", status=400
         )

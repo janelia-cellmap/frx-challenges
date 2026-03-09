@@ -14,6 +14,9 @@ def create(request: HttpRequest) -> HttpResponse:
     """
     Create a new submission.
     """
+    if settings.CHALLENGE_STATE != "RUNNING":
+        return HttpResponse("Submissions are paused.", status=403)
+
     html_content = MARKDOWN_RENDERER.render(
         settings.SITE_SUBMISSION_INSTRUCTIONS_MARKDOWN
     )
@@ -108,6 +111,8 @@ def edit(request: HttpRequest, id: int) -> HttpResponse:
     """
     Edit submission metadata
     """
+    if settings.CHALLENGE_STATE != "RUNNING":
+        return HttpResponse("Submissions are paused.", status=403)
 
     html_content = MARKDOWN_RENDERER.render(
         settings.SITE_SUBMISSION_INSTRUCTIONS_MARKDOWN

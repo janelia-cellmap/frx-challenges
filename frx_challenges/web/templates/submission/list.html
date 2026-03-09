@@ -16,8 +16,10 @@
                 <h1>My Submissions</h1>
             </div>
             <div class="col-4">
-                <a href="{% url 'submissions-create' %}"
-                   class="btn btn-secondary mt-2 float-end">Create submission</a>
+                {% if challenge_state == "RUNNING" %}
+                    <a href="{% url 'submissions-create' %}"
+                       class="btn btn-secondary mt-2 float-end">Create submission</a>
+                {% endif %}
             </div>
         </div>
         <div class="row">

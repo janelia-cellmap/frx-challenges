@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 class CustomLoginView(LoginView):
     def dispatch(self, request, *args, **kwargs):
-        if settings.CHALLENGE_STATE != "RUNNING":
+        if settings.CHALLENGE_STATE not in ("RUNNING", "PAUSED"):
             return HttpResponse(
                 "Challenge hasn't started, so login is not available", status=400
             )

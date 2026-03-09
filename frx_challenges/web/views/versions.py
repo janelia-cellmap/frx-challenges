@@ -15,6 +15,9 @@ from ..models import Collaborator, Evaluation, Submission, Version
 
 @login_required
 def upload(request: HttpRequest, id: int) -> HttpResponse:
+    if settings.CHALLENGE_STATE != "RUNNING":
+        return HttpResponse("Submissions are paused.", status=403)
+
     is_collaborator = _validate_collaborator(request, id)
     if not is_collaborator:
         raise Http404("Uploads are only available to submission collaborators.")

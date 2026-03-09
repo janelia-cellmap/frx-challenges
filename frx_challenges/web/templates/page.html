@@ -42,13 +42,13 @@
                                     <a class="nav-link " aria-current="page" href="{{ page_url }}">{{ p.title }}</a>
                                 </li>
                             {% endfor %}
-                            {% if challenge_state == "RUNNING" %}
+                            {% if challenge_state == "RUNNING" or challenge_state == "PAUSED" %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'leaderboard' %}">Leaderboard</a>
                                 </li>
                             {% endif %}
                             {% if request.user.is_authenticated %}
-                                {% if challenge_state == "RUNNING" %}
+                                {% if challenge_state == "RUNNING" or challenge_state == "PAUSED" %}
                                     <li class="nav-item">
                                         <a class="btn btn-primary" href="{% url 'submissions-list' %}">Submissions</a>
                                     </li>
@@ -62,7 +62,7 @@
                                     </li>
                                 {% endif %}
                             {% else %}
-                                {% if challenge_state == "RUNNING" %}
+                                {% if challenge_state == "RUNNING" or challenge_state == "PAUSED" %}
                                     <li class="nav-item">
                                         <a class="btn btn-primary"
                                            href="{% url 'github_login' %}?next={{ request.path }}">Login with GitHub</a>
