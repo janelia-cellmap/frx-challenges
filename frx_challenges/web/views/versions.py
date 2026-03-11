@@ -77,6 +77,7 @@ def download_results(request: HttpRequest, id: int) -> HttpResponse:
     return response
 
 
+@login_required
 def view(request: HttpRequest, id: int) -> HttpResponse:
     version = Version.objects.get(id=id)
     evaluation = version.latest_evaluation
@@ -104,6 +105,7 @@ def view(request: HttpRequest, id: int) -> HttpResponse:
     )
 
 
+@login_required
 def _validate_collaborator(request: HttpRequest, id: int):
     """
     Validate that the user is a collaborator of the submission.
