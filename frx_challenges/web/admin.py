@@ -1,6 +1,7 @@
 from allauth.account.decorators import secure_admin_login
 from django.contrib import admin
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from reversion.admin import VersionAdmin
 
@@ -20,6 +21,12 @@ class ContentFileAdmin(VersionAdmin):
 @admin.register(Evaluation)
 class EvaluationAdmin(VersionAdmin):
     list_display = ("id", "status", "version_link", "submission_name", "version__user__username", "created_at", "last_updated")
+    actions = ["set_status_not_started"]
+
+    @admin.action(description="Set status to Not Started")
+    def set_status_not_started(self, request, queryset):
+        updated = queryset.update(status=Evaluation.Status.NOT_STARTED, last_updated=timezone.now())
+        self.message_user(request, f"{updated} evaluation(s) set to Not Started.")
 
     def version_link(self, obj):
         url = reverse("admin:web_version_change", args=[obj.version.id])
