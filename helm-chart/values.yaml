@@ -60,7 +60,7 @@ databaseReaders: []
 nginx:
   image:
     repository: nginx
-    tag: 1.27
+    tag: 1.31.1
   resources: {}
 
 extraInitContainers: {}
