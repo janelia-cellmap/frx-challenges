@@ -59,10 +59,14 @@
     <script>
       async function main() {
           dayjs.extend(window.dayjs_plugin_relativeTime);
+          // The Score column is the last column (after Date, Name, metadata, and
+          // the other score columns). Default-sort by it, highest score first.
+          const scoreColumnIndex =
+              document.querySelectorAll("#results thead th").length - 1;
           const resultsTable = new DataTable("#results", {
               order: [
-                  // Apply reverse chronological ordering by default
-                  [0, "desc"]
+                  // Apply highest-Score-first ordering by default
+                  [scoreColumnIndex, "desc"]
               ],
               columnDefs: [
                   {
