@@ -50,6 +50,30 @@ app.kubernetes.io/name: {{ include "frx-challenges.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
+{{/*
+Name of the evaluator Deployment and its ServiceAccount
+*/}}
+{{- define "frx-challenges.evaluator.fullname" -}}
+{{- printf "%s-evaluator" (include "frx-challenges.fullname" . | trunc 53 | trimSuffix "-") }}
+{{- end }}
+
+{{/*
+Name of the web ServiceAccount
+*/}}
+{{- define "frx-challenges.web.serviceAccountName" -}}
+{{- printf "%s-web" (include "frx-challenges.fullname" . | trunc 59 | trimSuffix "-") }}
+{{- end }}
+
+{{/*
+Selector labels for the evaluator pod. The name differs from the web pod's so
+that the web Deployment and the Service (which select on the plain selector
+labels) never match the evaluator pod.
+*/}}
+{{- define "frx-challenges.evaluator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "frx-challenges.name" . }}-evaluator
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
 {{- define "frx-challenges.toYamlRecursive" -}}
 {{- range $key, $value := . }}
   {{- if kindIs "map" $value }}

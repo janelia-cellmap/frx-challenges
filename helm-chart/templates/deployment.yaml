@@ -23,7 +23,34 @@ spec:
         {{- end }}
       labels:
         {{- include "frx-challenges.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: web
     spec:
+      serviceAccountName: {{ include "frx-challenges.web.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      {{- with .Values.web.podSecurityContext }}
+      securityContext: {{ toJson . }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toJson . }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toJson . }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toJson . }}
+      {{- end }}
+      {{- if .Values.colocatePods }}
+      affinity:
+        # The state PVC is ReadWriteOnce, so this pod has to run on the node
+        # where the evaluator pod (the one with the big resource requests)
+        # was scheduled.
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  {{- include "frx-challenges.evaluator.selectorLabels" . | nindent 18 }}
+      {{- end }}
       initContainers:
         - name: db-migrate
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -101,45 +128,6 @@ spec:
             - name: django-yamlconf
               mountPath: /opt/frx-challenges/frx_challenges/frx_challenges.yaml
               subPath: frx_challenges.yaml
-        - name: dind
-          image: {{ .Values.dind.image.repository }}:{{ .Values.dind.image.tag }}
-          resources: {{ toJson .Values.dind.resources }}
-          command:
-            {{ if .Values.dind.rootless }}
-            - dind
-            {{- end }}
-            - dockerd
-            - --host=tcp://127.0.0.1:2376
-          volumeMounts:
-            - name: storage
-              mountPath: /opt/state
-            - name: dind-storage
-              mountPath: /var/lib/docker
-          securityContext:
-            privileged: true
-            runAsUser: 0
-          env:
-            - name: DOCKER_HOST
-              value: tcp://127.0.0.1:2376
-        - name: evaluator
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          resources: {{ toJson .Values.evaluator.resources }}
-          args:
-            - python
-            - manage.py
-            - evaluator
-          securityContext:
-            runAsUser: 0
-          volumeMounts:
-            - name: storage
-              mountPath: /opt/state
-            - name: django-yamlconf
-              mountPath: /opt/frx-challenges/frx_challenges/frx_challenges.yaml
-              subPath: frx_challenges.yaml
-          env:
-            - name: DOCKER_HOST
-              value: tcp://127.0.0.1:2376
         - name: nginx
           image: {{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}
           securityContext:
@@ -162,9 +150,6 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: {{ include "frx-challenges.fullname" . }}
-        - name: dind-storage
-          persistentVolumeClaim:
-            claimName: {{ include "frx-challenges.fullname" . }}-dind
         - name: staticfiles
           emptyDir: {}
         - name: django-yamlconf
