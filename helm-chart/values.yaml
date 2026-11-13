@@ -13,6 +13,12 @@ web:
   resources: {}
   # Pod-level securityContext of the web pod (nginx + django)
   podSecurityContext: {}
+  # Container-level securityContext of the django container and of the web
+  # pod's init containers (db-migrate, collect-static, admin-add). When empty
+  # they run as the image's user, which is root. To run as a non-root user,
+  # set runAsUser here and an fsGroup in web.podSecurityContext so that the
+  # state volume is writable (OpenShift's restricted-v2 SCC assigns both).
+  securityContext: {}
 
 imagePullSecrets: []
 nameOverride: ""
@@ -77,6 +83,14 @@ nginx:
     repository: nginx
     tag: 1.31.1
   resources: {}
+  # Port nginx listens on in the pod; defaults to service.port. The Service
+  # keeps exposing service.port.
+  containerPort:
+  # Container-level securityContext of the nginx container. When empty it
+  # runs as the image's user. To run as a non-root user, use the
+  # nginxinc/nginx-unprivileged image and a containerPort above 1024 (that
+  # image uses 8080).
+  securityContext: {}
 
 # Extra init containers for the web pod
 extraInitContainers: {}

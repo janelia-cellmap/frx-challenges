@@ -59,8 +59,7 @@ spec:
             - python
             - manage.py
             - migrate
-          securityContext:
-            runAsUser: 0
+          securityContext: {{ toJson .Values.web.securityContext }}
           volumeMounts:
             - name: storage
               mountPath: /opt/state
@@ -75,8 +74,7 @@ spec:
             - manage.py
             - collectstatic
             - --noinput
-          securityContext:
-            runAsUser: 0
+          securityContext: {{ toJson .Values.web.securityContext }}
           volumeMounts:
             - name: django-yamlconf
               mountPath: /opt/frx-challenges/frx_challenges/frx_challenges.yaml
@@ -94,8 +92,7 @@ spec:
             {{- range .Values.adminUsers }}
             - {{ . }}
             {{- end }}
-          securityContext:
-            runAsUser: 0
+          securityContext: {{ toJson .Values.web.securityContext }}
           volumeMounts:
             - name: storage
               mountPath: /opt/state
@@ -119,8 +116,7 @@ spec:
             - --bind
             - 127.0.0.1:8000
             - frx_challenges.wsgi
-          securityContext:
-            runAsUser: 0
+          securityContext: {{ toJson .Values.web.securityContext }}
           resources: {{ toJson .Values.web.resources }}
           volumeMounts:
             - name: storage
@@ -130,8 +126,7 @@ spec:
               subPath: frx_challenges.yaml
         - name: nginx
           image: {{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}
-          securityContext:
-            runAsUser: 0
+          securityContext: {{ toJson .Values.nginx.securityContext }}
           resources: {{ toJson .Values.nginx.resources }}
           volumeMounts:
             - name: storage
@@ -144,7 +139,7 @@ spec:
               readOnly: true
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ include "frx-challenges.nginx.port" . }}
               protocol: TCP
       volumes:
         - name: storage

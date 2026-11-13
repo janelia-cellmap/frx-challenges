@@ -51,6 +51,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Port nginx listens on inside the web pod. Defaults to the Service port; set
+nginx.containerPort to a port above 1024 to run nginx as a non-root user.
+*/}}
+{{- define "frx-challenges.nginx.port" -}}
+{{- .Values.nginx.containerPort | default .Values.service.port }}
+{{- end }}
+
+{{/*
 Name of the evaluator Deployment and its ServiceAccount
 */}}
 {{- define "frx-challenges.evaluator.fullname" -}}

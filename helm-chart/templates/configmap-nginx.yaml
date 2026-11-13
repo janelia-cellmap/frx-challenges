@@ -5,7 +5,7 @@ metadata:
 data:
   default.conf: |
     server {
-        listen {{ .Values.service.port }};
+        listen {{ include "frx-challenges.nginx.port" . }};
 
         # Increase the limit of
         client_max_body_size 1024m;
