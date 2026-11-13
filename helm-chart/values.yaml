@@ -11,16 +11,20 @@ image:
 
 web:
   resources: {}
+  # Pod-level securityContext of the web pod (nginx + django)
+  podSecurityContext: {}
+  # Container-level securityContext of the django container and of the web
+  # pod's init containers (db-migrate, collect-static, admin-add). When empty
+  # they run as the image's user, which is root. To run as a non-root user,
+  # set runAsUser here and an fsGroup in web.podSecurityContext so that the
+  # state volume is writable (OpenShift's restricted-v2 SCC assigns both).
+  securityContext: {}
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 podAnnotations: {}
-
-podSecurityContext: {}
-
-securityContext: {}
 
 service:
   type: ClusterIP
@@ -43,7 +47,24 @@ nodeSelector: {}
 
 tolerations: []
 
-affinity: {}
+# The web pod (nginx + django) and the evaluator pod (evaluator + dind) both
+# mount the ReadWriteOnce state PVC, so they must run on the same node. When
+# true, the web pod is required to schedule next to the evaluator pod, and the
+# evaluator pod prefers the node of the web pod.
+colocatePods: true
+
+networkPolicy:
+  # Create NetworkPolicies for the web and evaluator pods
+  enabled: false
+  web:
+    # List of NetworkPolicyPeer allowed to reach the web pod's http port.
+    # Leave empty to allow any source.
+    ingressFrom: []
+  evaluator:
+    # List of NetworkPolicyEgressRule for the evaluator pod. It needs DNS and
+    # the registry the evaluator image is pulled from. The pod never accepts
+    # inbound connections. Leave empty to deny all egress.
+    egress: []
 
 yamlSettings:
   enabled: false
@@ -62,11 +83,30 @@ nginx:
     repository: nginx
     tag: 1.31.1
   resources: {}
+  # Port nginx listens on in the pod; defaults to service.port. The Service
+  # keeps exposing service.port.
+  containerPort:
+  # Container-level securityContext of the nginx container. When empty it
+  # runs as the image's user. To run as a non-root user, use the
+  # nginxinc/nginx-unprivileged image and a containerPort above 1024 (that
+  # image uses 8080).
+  securityContext: {}
 
+# Extra init containers for the web pod
 extraInitContainers: {}
 
 evaluator:
   resources: {}
+  # Pod-level securityContext of the evaluator pod (evaluator + dind).
+  # Both pods mount the same volume, so where SELinux is enforcing they must
+  # run with the same SELinux level. On OpenShift the web pod gets the
+  # namespace's level from its SCC, but the evaluator pod runs under the
+  # `privileged` SCC, which assigns none. Set it explicitly, e.g.
+  #   seLinuxOptions:
+  #     level: "s0:c38,c22"   # the namespace's openshift.io/sa.scc.mcs annotation
+  podSecurityContext: {}
+  # Same format as extraInitContainers, added to the evaluator pod
+  extraInitContainers: {}
 
 dind:
   rootless: false

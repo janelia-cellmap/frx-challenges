@@ -1,0 +1,138 @@
+{{- /*
+The evaluator and the privileged Docker-in-Docker daemon it drives run in
+their own pod, separate from the internet-facing web pod. The Docker API
+listens on this pod's loopback only, so nothing in the web pod can reach it.
+*/}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "frx-challenges.evaluator.fullname" . }}
+  labels:
+    {{- include "frx-challenges.labels" . | nindent 4 }}
+    app.kubernetes.io/component: evaluator
+spec:
+  strategy:
+    # We have PVCs that can be only bound to one place, so needs to Recreate
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "frx-challenges.evaluator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- /* changed configmap checksum -> changed pod template -> triggers rollout */}}
+        checksum/configmap-yamlconf: {{ include (print .Template.BasePath "/configmap-yamlconf.yaml") . | sha256sum }}
+      labels:
+        {{- include "frx-challenges.evaluator.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: evaluator
+    spec:
+      serviceAccountName: {{ include "frx-challenges.evaluator.fullname" . }}
+      automountServiceAccountToken: false
+      {{- with .Values.evaluator.podSecurityContext }}
+      securityContext: {{ toJson . }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toJson . }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ toJson . }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{ toJson . }}
+      {{- end }}
+      {{- if .Values.colocatePods }}
+      affinity:
+        # The state PVC is ReadWriteOnce and is also mounted by the web pod.
+        # When only this pod is restarted, go back to the node where the web
+        # pod (and therefore the volume) still is. This is a preference, not a
+        # requirement, so that after both pods are gone (node drain, first
+        # install) this pod can go wherever its resource requests fit and the
+        # web pod follows it.
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    {{- include "frx-challenges.selectorLabels" . | nindent 20 }}
+      {{- end }}
+      initContainers:
+        # Migrations are run by the web pod. Don't start polling the database
+        # before they have been applied.
+        - name: wait-for-migrations
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - |
+              until python manage.py migrate --check; do
+                echo "waiting for the web pod to apply database migrations"
+                sleep 5
+              done
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: storage
+              mountPath: /opt/state
+            - name: django-yamlconf
+              mountPath: /opt/frx-challenges/frx_challenges/frx_challenges.yaml
+              subPath: frx_challenges.yaml
+        {{- with .Values.evaluator.extraInitContainers }}
+        {{- $extraInitContainers := . }}
+        {{- range (keys $extraInitContainers | sortAlpha) }}
+        - {{ get $extraInitContainers . | toYaml | nindent 10 | trim }}
+        {{- end }}
+        {{- end }}
+      containers:
+        - name: dind
+          image: {{ .Values.dind.image.repository }}:{{ .Values.dind.image.tag }}
+          resources: {{ toJson .Values.dind.resources }}
+          command:
+            {{- if .Values.dind.rootless }}
+            - dind
+            {{- end }}
+            - dockerd
+            - --host=tcp://127.0.0.1:2376
+          volumeMounts:
+            - name: storage
+              mountPath: /opt/state
+            - name: dind-storage
+              mountPath: /var/lib/docker
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          env:
+            - name: DOCKER_HOST
+              value: tcp://127.0.0.1:2376
+        - name: evaluator
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources: {{ toJson .Values.evaluator.resources }}
+          args:
+            - python
+            - manage.py
+            - evaluator
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: storage
+              mountPath: /opt/state
+            - name: django-yamlconf
+              mountPath: /opt/frx-challenges/frx_challenges/frx_challenges.yaml
+              subPath: frx_challenges.yaml
+          env:
+            - name: DOCKER_HOST
+              value: tcp://127.0.0.1:2376
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: {{ include "frx-challenges.fullname" . }}
+        - name: dind-storage
+          persistentVolumeClaim:
+            claimName: {{ include "frx-challenges.fullname" . }}-dind
+        - name: django-yamlconf
+          configMap:
+            name: {{ include "frx-challenges.fullname" . }}-django-yamlconf
